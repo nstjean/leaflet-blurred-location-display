@@ -67,7 +67,7 @@ BlurredLocationDisplay = function BlurredLocationDisplay(options) {
 
   function filterCoordinate(lat , lng) {
 
-      current_zoom = map.getZoom() ;
+      current_zoom = options.blurredLocation.map.getZoom() ;
 
       if(current_zoom >= 0 && current_zoom <=5){
         // Show all markers 
@@ -115,12 +115,13 @@ BlurredLocationDisplay = function BlurredLocationDisplay(options) {
       return parsed_data ;   
   }
 
-  var locations_markers_array = [] ;
-  var SourceUrl_markers_array = [] ;
+  let x = Math.random().toString(36).substr(2, 9) ;
+  eval('var locations_markers_array' + x + ' = [] ;') ;
+  eval('var SourceUrl_markers_array' + x + ' = [] ;') ;
 
   function removeAllMarkers(markers_array) {
     for(i in markers_array){
-      map.removeLayer(markers_array[i]) ;
+      options.blurredLocation.map.removeLayer(markers_array[i]) ;
     }
     markers_array = [] ;
     markers_array.length = 0 ; 
@@ -140,9 +141,9 @@ BlurredLocationDisplay = function BlurredLocationDisplay(options) {
               if(typeof afterDecimal !== "undefined") {
                 precision = afterDecimal.length ;
               }
-              var m = L.marker([latitude, longitude] , {icon: BlackIcon}) ;
-              m.addTo(map).bindPopup("Precision : " + precision) ;
-              locations_markers_array[locations_markers_array.length] = m ;
+              let m = L.marker([latitude, longitude] , {icon: BlackIcon}) ;
+              m.addTo(options.blurredLocation.map).bindPopup("Precision : " + precision) ;
+              eval('locations_markers_array' + x )[eval('locations_markers_array' + x).length] = m ;
         }
       } 
     }
@@ -150,10 +151,10 @@ BlurredLocationDisplay = function BlurredLocationDisplay(options) {
 
   function fetchSourceUrlData(isOn) {
     if(isOn === true) {
-      var NWlat = map.getBounds().getNorthWest().lat ;
-      var NWlng = map.getBounds().getNorthWest().lng ;
-      var SElat = map.getBounds().getSouthEast().lat ;
-      var SElng = map.getBounds().getSouthEast().lng ;
+      var NWlat = options.blurredLocation.map.getBounds().getNorthWest().lat ;
+      var NWlng = options.blurredLocation.map.getBounds().getNorthWest().lng ;
+      var SElat = options.blurredLocation.map.getBounds().getSouthEast().lat ;
+      var SElng = options.blurredLocation.map.getBounds().getSouthEast().lng ;
 
       source_url = options.source_url + "?nwlat=" + NWlat + "&selat=" + SElat + "&nwlng=" + NWlng + "&selng=" + SElng ; 
      
@@ -179,8 +180,8 @@ BlurredLocationDisplay = function BlurredLocationDisplay(options) {
                 if(typeof afterDecimal !== "undefined") {
                   precision = afterDecimal.length ;
                 }
-                m.addTo(map).bindPopup("<a href=" + url + ">" + title + "</a> <br> Precision : " + precision) ;
-                SourceUrl_markers_array[SourceUrl_markers_array.length] = m ;  
+                m.addTo(options.blurredLocation.map).bindPopup("<a href=" + url + ">" + title + "</a> <br> Precision : " + precision) ;
+                eval('SourceUrl_markers_array' + x )[eval('SourceUrl_markers_array' + x ).length] = m ;  
               }  
             }
       });  
@@ -188,22 +189,22 @@ BlurredLocationDisplay = function BlurredLocationDisplay(options) {
   }
 
   function return_locations_markers_array(){
-    return locations_markers_array ; 
+    return eval('locations_markers_array' + x ) ; 
   }
 
   function return_SourceUrl_markers_array(){
-    return SourceUrl_markers_array ; 
+    return eval('SourceUrl_markers_array' + x ) ; 
   }
 
   function activate_listeners(return_markers_array , fetchData)
   {
-    map.on('zoomend' , function () {
+    options.blurredLocation.map.on('zoomend' , function () {
       markers_array = return_markers_array() ;
       markers_array = removeAllMarkers(markers_array) ;
       fetchData(true) ; 
     }) ;
 
-    map.on('moveend' , function () {
+    options.blurredLocation.map.on('moveend' , function () {
       markers_array = return_markers_array() ;
       markers_array = removeAllMarkers(markers_array) ;
       fetchData(true) ; 
