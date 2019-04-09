@@ -31,6 +31,7 @@ module.exports = function changeRectangleColor(options){
 
  function ColorRectangles()
   { 
+     // console.log(options.return_all_markers_map()) ;
       if(typeof options.blurredLocation.getRectangle() !== "undefined"){
         options.blurredLocation.getRectangle().remove() ; 
       }
@@ -43,30 +44,26 @@ module.exports = function changeRectangleColor(options){
       drawFullHeatMap() ;
     } 
   }
-
-  ColorRectangles() ; 
+  if(options.style === 'heatmap' || options.style === 'both'){
+    ColorRectangles() ; 
+  }
 
   function calculateMarkersInsideRect(bounds)
   {
-    let locations = options.return_locations_markers_array() ;
-    let remote_locations = options.return_SourceUrl_markers_array() ;
+    let locations = options.return_all_markers_map() ;
     let ctr = 0 ; 
 
-    for(let i=0 ; i<locations.length ; i++){
-      let latitude = locations[i]._latlng.lat ; 
-      let longitude = locations[i]._latlng.lng ; 
-      if(latitude >= bounds[0][0] && latitude <= bounds[1][0] && longitude >= bounds[0][1] && longitude <= bounds[1][1]){
-        ctr++ ;
+    locations.forEach(function(value , key , map){
+      if(typeof(value._latlng) != "undefined"){
+        let latitude = value._latlng.lat ; 
+       // console.log(latitude) ; 
+        let longitude = value._latlng.lng ; 
+        if(latitude >= bounds[0][0] && latitude <= bounds[1][0] && longitude >= bounds[0][1] && longitude <= bounds[1][1]){
+          ctr++ ;
+        }
       }
-    }
-
-    for(let i=0 ; i<remote_locations.length ; i++){
-      let latitude = remote_locations[i]._latlng.lat ; 
-      let longitude = remote_locations[i]._latlng.lng ; 
-      if(latitude >= bounds[0][0] && latitude <= bounds[1][0] && longitude >= bounds[0][1] && longitude <= bounds[1][1]){
-        ctr++ ;
-      }
-    }
+    }) ;
+        
     return ctr ;
   }
 
@@ -91,7 +88,7 @@ module.exports = function changeRectangleColor(options){
      }
   }
 
-  // generated left row of rectangles starting from current_lng to left_lng !
+  // generated right row of rectangles starting from current_lng to right_lng !
   function rightRectangles(right_lng , current_lng , upper_lat , lower_lat , diff)
   {
     while(current_lng-diff <= right_lng){
@@ -125,7 +122,8 @@ module.exports = function changeRectangleColor(options){
      let current_SW_lng = center_SW.lng ; 
 
      let current_upper_lat = center_SW.lat ; 
-     while(current_upper_lat <= map.getBounds().getNorthEast().lng){
+
+     while(current_upper_lat <= map.getBounds().getNorthEast().lat){
 
       current_SW_lng = center_SW.lng ; 
       leftRectangles(map.getBounds().getSouthWest().lng , current_SW_lng , current_upper_lat + diff , current_upper_lat, diff) ;
